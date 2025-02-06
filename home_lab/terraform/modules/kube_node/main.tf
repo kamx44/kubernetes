@@ -1,14 +1,14 @@
-resource "proxmox_vm_qemu" "clone_vm"{
+resource "proxmox_vm_qemu" "cloned_vm"{
     
-    name        = "k8s-vm-${each.key}"
+    name        = var.vm_name
     target_node = "pve"
     
-    vmid = each.value.vmid
+    vmid = var.vm_id
     ### or for a Clone VM operation
-    clone = "ubuntu-24-template"
+    clone = var.clone_name
     full_clone = true
-    cores = 2
-    memory = 2048
+    cores = var.cores
+    memory = var.memory
     agent = 1
     onboot = true
 
@@ -54,27 +54,25 @@ resource "proxmox_vm_qemu" "clone_vm"{
         firewall = false
         link_down = false
         id = 0
-        macaddr = each.value.mac_address
+        macaddr = var.network.mac_address
     }
 
-    sshkeys = var.public_key
-    ciuser = var.vm_user
-    cipassword = var.vm_password
+    sshkeys = var.authentications.public_key
+    ciuser = var.authentications.vm_user
+    cipassword = var.authentications.vm_password
     ciupgrade = true
 
-    nameserver = "192.168.137.1"
-    ipconfig0= "ip=${each.value.ip},gw=192.168.137.1"
+    nameserver = var.network.nameserver
+    ipconfig0= "ip=${var.network.ip_cidr},gw=${var.network.gateway}"
     define_connection_info = true
 
 }
 
 
-output "host-master" {
-  value =  proxmox_vm_qemu.test-vm-master["master"].ssh_host
-}
+
 
 resource "time_sleep" "wait_1_minute-master" {
-  depends_on = [proxmox_vm_qemu.test-vm-master]
+  depends_on = [proxmox_vm_qemu.cloned_vm]
 
   create_duration = "60s"
 }
@@ -92,9 +90,9 @@ resource "null_resource" "install-agent-master"{
 
     connection {
       type        = "ssh"
-      user        = var.vm_user
-      host        = proxmox_vm_qemu.test-vm-master["master"].ssh_host
-      private_key = file(var.private_key_location)
+      user        = var.authentications.vm_user
+      host        = proxmox_vm_qemu.cloned_vm.ssh_host
+      private_key = file(var.authentications.private_key_location)
       port        = 22
       timeout     = "2m"
     }
@@ -114,9 +112,9 @@ resource "null_resource" "init-node-master"{
 
      connection {
       type        = "ssh"
-      user        = var.vm_user
-      host        = proxmox_vm_qemu.test-vm-master["master"].ssh_host
-      private_key = file(var.private_key_location)
+      user        = var.authentications.vm_user
+      host        = proxmox_vm_qemu.cloned_vm.ssh_host
+      private_key = file(var.authentications.private_key_location)
       port        = 22
       timeout     = "2m"
     }
@@ -131,9 +129,9 @@ resource "null_resource" "init-node-master"{
   
     connection {
       type        = "ssh"
-      user        = var.vm_user
-      host        = proxmox_vm_qemu.test-vm-master["master"].ssh_host
-      private_key = file(var.private_key_location)
+      user        = var.authentications.vm_user
+      host        = proxmox_vm_qemu.cloned_vm.ssh_host
+      private_key = file(var.authentications.private_key_location)
       port        = 22
       timeout     = "2m"
     }
