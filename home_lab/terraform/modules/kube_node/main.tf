@@ -107,7 +107,7 @@ resource "null_resource" "install-agent-master"{
 resource "null_resource" "init-node-master"{
 
   provisioner "file" {
-    source      = "scripts\\init_node.sh"
+    source      = "${path.module}\\scripts\\init_node.sh"
     destination = "/tmp/init_node.sh"
 
      connection {

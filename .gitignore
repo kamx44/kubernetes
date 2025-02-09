@@ -1,0 +1,3 @@
+home_lab/local
+home_lab/terraform/.terraform*
+home_lab/terraform/terraform.tfstate*
