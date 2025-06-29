@@ -82,6 +82,7 @@ resource "null_resource" "install-agent-master"{
   provisioner "remote-exec" {
     inline = [
       "sudo apt update",
+      "sleep 30",
       "sudo apt-get install qemu-guest-agent -y",
       "sudo systemctl start qemu-guest-agent",
       "sudo systemctl enable qemu-guest-agent",
@@ -105,6 +106,7 @@ resource "null_resource" "install-agent-master"{
 
 
 resource "null_resource" "init-node-master"{
+  count = var.init_kuberentes ? 1 : 0
 
   provisioner "file" {
     source      = "${path.module}\\scripts\\init_node.sh"

@@ -35,3 +35,8 @@ variable "authentications" {
     private_key_location = string
   })
 }
+
+variable "init_kuberentes" {
+  type = bool
+  default = true
+}
