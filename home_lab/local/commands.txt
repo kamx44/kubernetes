@@ -1,0 +1,17 @@
+Clearing ARP Cache after redeploying VMs with the same imagePullSecrets:
+netsh interface ip delete arpcache
+
+qm set 900 --serial0 socket --vga serial0
+
+sudo apt install qemu-guest-agent
+
+reboot
+
+proxmox server:
+https://192.168.137.15:8006/
+
+token id:
+terraform@pam!terraform
+
+secret:
+138bcf7e-917a-4a95-a02e-fb200c2f5546
